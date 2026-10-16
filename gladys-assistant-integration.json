@@ -1,0 +1,1476 @@
+{
+  "manifest_version": 1,
+  "type": "weather",
+  "name": "Bureau of Meteorology (BoM)",
+  "description": {
+    "en": "Australian weather from the Bureau of Meteorology: forecasts, observations and warnings.",
+    "fr": "Météo australienne du Bureau of Meteorology : prévisions, observations et alertes.",
+    "de": "Australisches Wetter vom Bureau of Meteorology: Vorhersagen, Messwerte und Warnungen.",
+    "es": "Tiempo australiano del Bureau of Meteorology: pronósticos, observaciones y avisos."
+  },
+  "version": "0.0.0",
+  "docker_image": "ghcr.io/gboulvin/gladys-bom:0.0.0",
+  "gladys_version": ">=5.1.0",
+  "cover_image": "https://raw.githubusercontent.com/gboulvin/Gladys-BoM/main/cover.png",
+  "categories": ["environment", "services"],
+  "transports": ["cloud"],
+  "location": true,
+  "config_schema": [
+    {
+      "key": "intro",
+      "type": "section",
+      "label": {
+        "en": "Getting started",
+        "fr": "Pour commencer",
+        "de": "Erste Schritte",
+        "es": "Primeros pasos"
+      },
+      "description": {
+        "en": "Weather, forecasts and warnings come from the public API of the Australian Bureau of Meteorology: no account, no API key, Australia only. Leave the location empty to use the position of your Gladys house.",
+        "fr": "La météo, les prévisions et les alertes viennent de l'API publique du Bureau of Meteorology australien : pas de compte, pas de clé d'API, Australie uniquement. Laissez la localisation vide pour utiliser la position de votre maison Gladys.",
+        "de": "Wetter, Vorhersagen und Warnungen stammen aus der öffentlichen API des australischen Bureau of Meteorology: kein Konto, kein API-Schlüssel, nur Australien. Lassen Sie den Ort leer, um die Position Ihres Gladys-Hauses zu verwenden.",
+        "es": "El tiempo, los pronósticos y los avisos proceden de la API pública del Bureau of Meteorology australiano: sin cuenta, sin clave de API, solo Australia. Deje la ubicación vacía para usar la posición de su casa de Gladys."
+      },
+      "links": [
+        {
+          "url": "https://www.bom.gov.au/",
+          "label": {
+            "en": "Bureau of Meteorology",
+            "fr": "Bureau of Meteorology",
+            "de": "Bureau of Meteorology",
+            "es": "Bureau of Meteorology"
+          }
+        },
+        {
+          "url": "https://www.bom.gov.au/australia/warnings/",
+          "label": {
+            "en": "Current warnings",
+            "fr": "Alertes en cours",
+            "de": "Aktuelle Warnungen",
+            "es": "Avisos vigentes"
+          }
+        }
+      ]
+    },
+    {
+      "key": "location",
+      "type": "string",
+      "label": {
+        "en": "Location",
+        "fr": "Localisation",
+        "de": "Ort",
+        "es": "Ubicación"
+      },
+      "description": {
+        "en": "Suburb, town, postcode or \"latitude,longitude\". Leave empty to use the position of your Gladys house.",
+        "fr": "Banlieue, ville, code postal ou « latitude,longitude ». Laissez vide pour utiliser la position de votre maison Gladys.",
+        "de": "Vorort, Stadt, Postleitzahl oder „Breite,Länge“. Leer lassen, um die Position Ihres Gladys-Hauses zu verwenden.",
+        "es": "Barrio, ciudad, código postal o «latitud,longitud». Deje vacío para usar la posición de su casa de Gladys."
+      },
+      "placeholder": {
+        "en": "e.g. Parramatta or 2150",
+        "fr": "ex. Parramatta ou 2150",
+        "de": "z. B. Parramatta oder 2150",
+        "es": "p. ej. Parramatta o 2150"
+      },
+      "required": false,
+      "default": ""
+    },
+    {
+      "key": "warning_check_minutes",
+      "type": "number",
+      "label": {
+        "en": "Warning check interval (min)",
+        "fr": "Intervalle de vérification des alertes (min)",
+        "de": "Prüfintervall für Warnungen (min)",
+        "es": "Intervalo de comprobación de avisos (min)"
+      },
+      "description": {
+        "en": "How often warnings and the fire danger rating are checked to fire the scene triggers.",
+        "fr": "Fréquence de vérification des alertes et du danger d'incendie, pour déclencher les scènes.",
+        "de": "Wie oft Warnungen und Brandgefahr geprüft werden, um Szenen auszulösen.",
+        "es": "Frecuencia de comprobación de avisos y peligro de incendio para activar las escenas."
+      },
+      "required": false,
+      "default": 10,
+      "min": 5,
+      "max": 60
+    },
+    {
+      "key": "fire_danger_alerts",
+      "type": "boolean",
+      "label": {
+        "en": "Fire danger as weather alerts",
+        "fr": "Danger d'incendie en alerte météo",
+        "de": "Brandgefahr als Wetterwarnung",
+        "es": "Peligro de incendio como alerta"
+      },
+      "description": {
+        "en": "Report a fire danger rating of High, Extreme or Catastrophic as a Gladys weather alert.",
+        "fr": "Signaler un danger d'incendie Élevé, Extrême ou Catastrophique comme alerte météo Gladys.",
+        "de": "Eine Brandgefahr Hoch, Extrem oder Katastrophal als Gladys-Wetterwarnung melden.",
+        "es": "Notificar un peligro de incendio Alto, Extremo o Catastrófico como alerta meteorológica de Gladys."
+      },
+      "required": false,
+      "default": true
+    }
+  ],
+  "actions": [
+    {
+      "key": "test_connection",
+      "label": {
+        "en": "Test the connection",
+        "fr": "Tester la connexion",
+        "de": "Verbindung testen",
+        "es": "Probar la conexión"
+      },
+      "description": {
+        "en": "Read the latest observation of the configured location.",
+        "fr": "Lit la dernière observation de la localisation configurée.",
+        "de": "Liest die letzte Messung des konfigurierten Orts.",
+        "es": "Lee la última observación de la ubicación configurada."
+      },
+      "timeout_seconds": 30
+    },
+    {
+      "key": "search_location",
+      "label": {
+        "en": "Find a location",
+        "fr": "Rechercher un lieu",
+        "de": "Ort suchen",
+        "es": "Buscar un lugar"
+      },
+      "description": {
+        "en": "List the BoM places matching a name or a postcode.",
+        "fr": "Liste les lieux du BoM correspondant à un nom ou un code postal.",
+        "de": "Listet die BoM-Orte zu einem Namen oder einer Postleitzahl auf.",
+        "es": "Muestra los lugares del BoM que coinciden con un nombre o código postal."
+      },
+      "timeout_seconds": 20,
+      "fields": [
+        {
+          "key": "query",
+          "type": "string",
+          "label": {
+            "en": "Name or postcode",
+            "fr": "Nom ou code postal",
+            "de": "Name oder Postleitzahl",
+            "es": "Nombre o código postal"
+          },
+          "placeholder": {
+            "en": "e.g. Bondi or 2026",
+            "fr": "ex. Bondi ou 2026",
+            "de": "z. B. Bondi oder 2026",
+            "es": "p. ej. Bondi o 2026"
+          },
+          "required": true
+        }
+      ]
+    }
+  ],
+  "scene_triggers": [
+    {
+      "key": "warning_issued",
+      "label": {
+        "en": "BoM warning issued",
+        "fr": "Alerte BoM émise",
+        "de": "BoM-Warnung ausgegeben",
+        "es": "Aviso del BoM emitido"
+      },
+      "description": {
+        "en": "A new Bureau of Meteorology warning covers the location.",
+        "fr": "Une nouvelle alerte du Bureau of Meteorology concerne la localisation.",
+        "de": "Eine neue Warnung des Bureau of Meteorology betrifft den Ort.",
+        "es": "Un nuevo aviso del Bureau of Meteorology afecta a la ubicación."
+      },
+      "fields": [
+        {
+          "key": "warning_type",
+          "type": "multi_select",
+          "label": {
+            "en": "Warning type",
+            "fr": "Type d'alerte",
+            "de": "Warnungsart",
+            "es": "Tipo de aviso"
+          },
+          "description": {
+            "en": "Leave empty for any warning.",
+            "fr": "Laissez vide pour toutes les alertes.",
+            "de": "Leer lassen für alle Warnungen.",
+            "es": "Deje vacío para cualquier aviso."
+          },
+          "options": [
+            {
+              "value": "flood",
+              "label": {
+                "en": "Flood",
+                "fr": "Inondation",
+                "de": "Hochwasser",
+                "es": "Inundación"
+              }
+            },
+            {
+              "value": "thunderstorm",
+              "label": {
+                "en": "Severe thunderstorm",
+                "fr": "Orage violent",
+                "de": "Schweres Gewitter",
+                "es": "Tormenta severa"
+              }
+            },
+            {
+              "value": "severe_weather",
+              "label": {
+                "en": "Severe weather",
+                "fr": "Intempéries",
+                "de": "Unwetter",
+                "es": "Tiempo severo"
+              }
+            },
+            {
+              "value": "fire_weather",
+              "label": {
+                "en": "Fire weather",
+                "fr": "Conditions propices aux feux",
+                "de": "Feuerwetter",
+                "es": "Tiempo propicio a incendios"
+              }
+            },
+            {
+              "value": "heatwave",
+              "label": {
+                "en": "Heatwave",
+                "fr": "Canicule",
+                "de": "Hitzewelle",
+                "es": "Ola de calor"
+              }
+            },
+            {
+              "value": "tropical_cyclone",
+              "label": {
+                "en": "Tropical cyclone",
+                "fr": "Cyclone tropical",
+                "de": "Tropischer Wirbelsturm",
+                "es": "Ciclón tropical"
+              }
+            },
+            {
+              "value": "wind",
+              "label": {
+                "en": "Wind (marine, coastal)",
+                "fr": "Vent (marin, côtier)",
+                "de": "Wind (See, Küste)",
+                "es": "Viento (marino, costero)"
+              }
+            },
+            {
+              "value": "cold",
+              "label": {
+                "en": "Cold (sheep graziers, frost)",
+                "fr": "Froid (éleveurs, gel)",
+                "de": "Kälte (Schafhalter, Frost)",
+                "es": "Frío (ganaderos, helada)"
+              }
+            },
+            {
+              "value": "tsunami",
+              "label": {
+                "en": "Tsunami",
+                "fr": "Tsunami",
+                "de": "Tsunami",
+                "es": "Tsunami"
+              }
+            },
+            {
+              "value": "coastal",
+              "label": {
+                "en": "Coastal hazard, hazardous surf",
+                "fr": "Danger côtier, houle dangereuse",
+                "de": "Küstengefahr, gefährliche Brandung",
+                "es": "Peligro costero, oleaje peligroso"
+              }
+            },
+            {
+              "value": "other",
+              "label": {
+                "en": "Other",
+                "fr": "Autre",
+                "de": "Sonstige",
+                "es": "Otro"
+              }
+            }
+          ]
+        },
+        {
+          "key": "severity",
+          "type": "select",
+          "label": {
+            "en": "Severity",
+            "fr": "Gravité",
+            "de": "Schweregrad",
+            "es": "Gravedad"
+          },
+          "options": [
+            {
+              "value": "major",
+              "label": {
+                "en": "Major",
+                "fr": "Majeure",
+                "de": "Schwer",
+                "es": "Mayor"
+              }
+            },
+            {
+              "value": "minor",
+              "label": {
+                "en": "Minor",
+                "fr": "Mineure",
+                "de": "Gering",
+                "es": "Menor"
+              }
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "key": "title",
+          "type": "string",
+          "label": {
+            "en": "Warning name",
+            "fr": "Nom de l'alerte",
+            "de": "Name der Warnung",
+            "es": "Nombre del aviso"
+          }
+        },
+        {
+          "key": "area",
+          "type": "string",
+          "label": {
+            "en": "Area concerned",
+            "fr": "Zone concernée",
+            "de": "Betroffenes Gebiet",
+            "es": "Zona afectada"
+          }
+        },
+        {
+          "key": "warning_type",
+          "type": "string",
+          "label": {
+            "en": "Warning type",
+            "fr": "Type d'alerte",
+            "de": "Warnungsart",
+            "es": "Tipo de aviso"
+          }
+        },
+        {
+          "key": "severity",
+          "type": "string",
+          "label": {
+            "en": "Severity (major, minor)",
+            "fr": "Gravité (major, minor)",
+            "de": "Schweregrad (major, minor)",
+            "es": "Gravedad (major, minor)"
+          }
+        },
+        {
+          "key": "bom_type",
+          "type": "string",
+          "label": {
+            "en": "BoM warning type",
+            "fr": "Type BoM de l'alerte",
+            "de": "BoM-Warnungstyp",
+            "es": "Tipo de aviso del BoM"
+          }
+        },
+        {
+          "key": "phase",
+          "type": "string",
+          "label": {
+            "en": "Phase",
+            "fr": "Phase",
+            "de": "Phase",
+            "es": "Fase"
+          }
+        },
+        {
+          "key": "warning_id",
+          "type": "string",
+          "label": {
+            "en": "Warning identifier",
+            "fr": "Identifiant de l'alerte",
+            "de": "Kennung der Warnung",
+            "es": "Identificador del aviso"
+          }
+        },
+        {
+          "key": "issue_time",
+          "type": "string",
+          "label": {
+            "en": "Issued at",
+            "fr": "Émise à",
+            "de": "Ausgegeben um",
+            "es": "Emitido a las"
+          }
+        },
+        {
+          "key": "expiry_time",
+          "type": "string",
+          "label": {
+            "en": "Expires at",
+            "fr": "Expire à",
+            "de": "Läuft ab um",
+            "es": "Expira a las"
+          }
+        },
+        {
+          "key": "location",
+          "type": "string",
+          "label": {
+            "en": "Location",
+            "fr": "Localisation",
+            "de": "Ort",
+            "es": "Ubicación"
+          }
+        }
+      ]
+    },
+    {
+      "key": "warning_cancelled",
+      "label": {
+        "en": "BoM warning ended",
+        "fr": "Fin d'alerte BoM",
+        "de": "BoM-Warnung beendet",
+        "es": "Fin de aviso del BoM"
+      },
+      "description": {
+        "en": "A warning covering the location was cancelled or expired.",
+        "fr": "Une alerte concernant la localisation a été levée ou a expiré.",
+        "de": "Eine Warnung für den Ort wurde aufgehoben oder ist abgelaufen.",
+        "es": "Un aviso de la ubicación fue cancelado o expiró."
+      },
+      "fields": [
+        {
+          "key": "warning_type",
+          "type": "multi_select",
+          "label": {
+            "en": "Warning type",
+            "fr": "Type d'alerte",
+            "de": "Warnungsart",
+            "es": "Tipo de aviso"
+          },
+          "description": {
+            "en": "Leave empty for any warning.",
+            "fr": "Laissez vide pour toutes les alertes.",
+            "de": "Leer lassen für alle Warnungen.",
+            "es": "Deje vacío para cualquier aviso."
+          },
+          "options": [
+            {
+              "value": "flood",
+              "label": {
+                "en": "Flood",
+                "fr": "Inondation",
+                "de": "Hochwasser",
+                "es": "Inundación"
+              }
+            },
+            {
+              "value": "thunderstorm",
+              "label": {
+                "en": "Severe thunderstorm",
+                "fr": "Orage violent",
+                "de": "Schweres Gewitter",
+                "es": "Tormenta severa"
+              }
+            },
+            {
+              "value": "severe_weather",
+              "label": {
+                "en": "Severe weather",
+                "fr": "Intempéries",
+                "de": "Unwetter",
+                "es": "Tiempo severo"
+              }
+            },
+            {
+              "value": "fire_weather",
+              "label": {
+                "en": "Fire weather",
+                "fr": "Conditions propices aux feux",
+                "de": "Feuerwetter",
+                "es": "Tiempo propicio a incendios"
+              }
+            },
+            {
+              "value": "heatwave",
+              "label": {
+                "en": "Heatwave",
+                "fr": "Canicule",
+                "de": "Hitzewelle",
+                "es": "Ola de calor"
+              }
+            },
+            {
+              "value": "tropical_cyclone",
+              "label": {
+                "en": "Tropical cyclone",
+                "fr": "Cyclone tropical",
+                "de": "Tropischer Wirbelsturm",
+                "es": "Ciclón tropical"
+              }
+            },
+            {
+              "value": "wind",
+              "label": {
+                "en": "Wind (marine, coastal)",
+                "fr": "Vent (marin, côtier)",
+                "de": "Wind (See, Küste)",
+                "es": "Viento (marino, costero)"
+              }
+            },
+            {
+              "value": "cold",
+              "label": {
+                "en": "Cold (sheep graziers, frost)",
+                "fr": "Froid (éleveurs, gel)",
+                "de": "Kälte (Schafhalter, Frost)",
+                "es": "Frío (ganaderos, helada)"
+              }
+            },
+            {
+              "value": "tsunami",
+              "label": {
+                "en": "Tsunami",
+                "fr": "Tsunami",
+                "de": "Tsunami",
+                "es": "Tsunami"
+              }
+            },
+            {
+              "value": "coastal",
+              "label": {
+                "en": "Coastal hazard, hazardous surf",
+                "fr": "Danger côtier, houle dangereuse",
+                "de": "Küstengefahr, gefährliche Brandung",
+                "es": "Peligro costero, oleaje peligroso"
+              }
+            },
+            {
+              "value": "other",
+              "label": {
+                "en": "Other",
+                "fr": "Autre",
+                "de": "Sonstige",
+                "es": "Otro"
+              }
+            }
+          ]
+        },
+        {
+          "key": "severity",
+          "type": "select",
+          "label": {
+            "en": "Severity",
+            "fr": "Gravité",
+            "de": "Schweregrad",
+            "es": "Gravedad"
+          },
+          "options": [
+            {
+              "value": "major",
+              "label": {
+                "en": "Major",
+                "fr": "Majeure",
+                "de": "Schwer",
+                "es": "Mayor"
+              }
+            },
+            {
+              "value": "minor",
+              "label": {
+                "en": "Minor",
+                "fr": "Mineure",
+                "de": "Gering",
+                "es": "Menor"
+              }
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "key": "title",
+          "type": "string",
+          "label": {
+            "en": "Warning name",
+            "fr": "Nom de l'alerte",
+            "de": "Name der Warnung",
+            "es": "Nombre del aviso"
+          }
+        },
+        {
+          "key": "area",
+          "type": "string",
+          "label": {
+            "en": "Area concerned",
+            "fr": "Zone concernée",
+            "de": "Betroffenes Gebiet",
+            "es": "Zona afectada"
+          }
+        },
+        {
+          "key": "warning_type",
+          "type": "string",
+          "label": {
+            "en": "Warning type",
+            "fr": "Type d'alerte",
+            "de": "Warnungsart",
+            "es": "Tipo de aviso"
+          }
+        },
+        {
+          "key": "severity",
+          "type": "string",
+          "label": {
+            "en": "Severity (major, minor)",
+            "fr": "Gravité (major, minor)",
+            "de": "Schweregrad (major, minor)",
+            "es": "Gravedad (major, minor)"
+          }
+        },
+        {
+          "key": "bom_type",
+          "type": "string",
+          "label": {
+            "en": "BoM warning type",
+            "fr": "Type BoM de l'alerte",
+            "de": "BoM-Warnungstyp",
+            "es": "Tipo de aviso del BoM"
+          }
+        },
+        {
+          "key": "phase",
+          "type": "string",
+          "label": {
+            "en": "Phase",
+            "fr": "Phase",
+            "de": "Phase",
+            "es": "Fase"
+          }
+        },
+        {
+          "key": "warning_id",
+          "type": "string",
+          "label": {
+            "en": "Warning identifier",
+            "fr": "Identifiant de l'alerte",
+            "de": "Kennung der Warnung",
+            "es": "Identificador del aviso"
+          }
+        },
+        {
+          "key": "issue_time",
+          "type": "string",
+          "label": {
+            "en": "Issued at",
+            "fr": "Émise à",
+            "de": "Ausgegeben um",
+            "es": "Emitido a las"
+          }
+        },
+        {
+          "key": "expiry_time",
+          "type": "string",
+          "label": {
+            "en": "Expires at",
+            "fr": "Expire à",
+            "de": "Läuft ab um",
+            "es": "Expira a las"
+          }
+        },
+        {
+          "key": "location",
+          "type": "string",
+          "label": {
+            "en": "Location",
+            "fr": "Localisation",
+            "de": "Ort",
+            "es": "Ubicación"
+          }
+        }
+      ]
+    },
+    {
+      "key": "fire_danger_changed",
+      "label": {
+        "en": "Fire danger rating changed",
+        "fr": "Danger d'incendie modifié",
+        "de": "Brandgefahr geändert",
+        "es": "Peligro de incendio cambiado"
+      },
+      "description": {
+        "en": "Today's fire danger rating of the location changed.",
+        "fr": "Le niveau de danger d'incendie du jour a changé.",
+        "de": "Die heutige Brandgefahrenstufe des Orts hat sich geändert.",
+        "es": "El nivel de peligro de incendio de hoy cambió."
+      },
+      "fields": [
+        {
+          "key": "rating",
+          "type": "multi_select",
+          "label": {
+            "en": "New rating",
+            "fr": "Nouveau niveau",
+            "de": "Neue Stufe",
+            "es": "Nuevo nivel"
+          },
+          "description": {
+            "en": "Leave empty for any change.",
+            "fr": "Laissez vide pour tout changement.",
+            "de": "Leer lassen für jede Änderung.",
+            "es": "Deje vacío para cualquier cambio."
+          },
+          "options": [
+            {
+              "value": "no_rating",
+              "label": {
+                "en": "No rating",
+                "fr": "Aucun niveau",
+                "de": "Keine Einstufung",
+                "es": "Sin clasificación"
+              }
+            },
+            {
+              "value": "moderate",
+              "label": {
+                "en": "Moderate",
+                "fr": "Modéré",
+                "de": "Mäßig",
+                "es": "Moderado"
+              }
+            },
+            {
+              "value": "high",
+              "label": {
+                "en": "High",
+                "fr": "Élevé",
+                "de": "Hoch",
+                "es": "Alto"
+              }
+            },
+            {
+              "value": "extreme",
+              "label": {
+                "en": "Extreme",
+                "fr": "Extrême",
+                "de": "Extrem",
+                "es": "Extremo"
+              }
+            },
+            {
+              "value": "catastrophic",
+              "label": {
+                "en": "Catastrophic",
+                "fr": "Catastrophique",
+                "de": "Katastrophal",
+                "es": "Catastrófico"
+              }
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "key": "rating",
+          "type": "string",
+          "label": {
+            "en": "New rating",
+            "fr": "Nouveau niveau",
+            "de": "Neue Stufe",
+            "es": "Nuevo nivel"
+          }
+        },
+        {
+          "key": "previous_rating",
+          "type": "string",
+          "label": {
+            "en": "Previous rating",
+            "fr": "Niveau précédent",
+            "de": "Vorherige Stufe",
+            "es": "Nivel anterior"
+          }
+        },
+        {
+          "key": "rating_label",
+          "type": "string",
+          "label": {
+            "en": "Rating (text)",
+            "fr": "Niveau (texte)",
+            "de": "Stufe (Text)",
+            "es": "Nivel (texto)"
+          }
+        },
+        {
+          "key": "location",
+          "type": "string",
+          "label": {
+            "en": "Location",
+            "fr": "Localisation",
+            "de": "Ort",
+            "es": "Ubicación"
+          }
+        }
+      ]
+    }
+  ],
+  "scene_actions": [
+    {
+      "key": "get_current_conditions",
+      "label": {
+        "en": "Get BoM current conditions",
+        "fr": "Conditions actuelles BoM",
+        "de": "Aktuelle BoM-Messwerte",
+        "es": "Condiciones actuales BoM"
+      },
+      "description": {
+        "en": "Latest observation of the nearest BoM station (°C, km/h, mm).",
+        "fr": "Dernière observation de la station BoM la plus proche (°C, km/h, mm).",
+        "de": "Letzte Messung der nächsten BoM-Station (°C, km/h, mm).",
+        "es": "Última observación de la estación BoM más cercana (°C, km/h, mm)."
+      },
+      "timeout_seconds": 20,
+      "fields": [
+        {
+          "key": "location",
+          "type": "string",
+          "label": {
+            "en": "Location",
+            "fr": "Localisation",
+            "de": "Ort",
+            "es": "Ubicación"
+          },
+          "description": {
+            "en": "Leave empty for the configured location. Accepts scene variables.",
+            "fr": "Laissez vide pour la localisation configurée. Accepte les variables de scène.",
+            "de": "Leer lassen für den konfigurierten Ort. Akzeptiert Szenenvariablen.",
+            "es": "Deje vacío para la ubicación configurada. Acepta variables de escena."
+          },
+          "placeholder": {
+            "en": "e.g. Parramatta or 2150",
+            "fr": "ex. Parramatta ou 2150",
+            "de": "z. B. Parramatta oder 2150",
+            "es": "p. ej. Parramatta o 2150"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "key": "temperature",
+          "type": "number",
+          "label": {
+            "en": "Temperature (°C)",
+            "fr": "Température (°C)",
+            "de": "Temperatur (°C)",
+            "es": "Temperatura (°C)"
+          }
+        },
+        {
+          "key": "apparent_temperature",
+          "type": "number",
+          "label": {
+            "en": "Feels like (°C)",
+            "fr": "Ressenti (°C)",
+            "de": "Gefühlt (°C)",
+            "es": "Sensación (°C)"
+          }
+        },
+        {
+          "key": "humidity",
+          "type": "number",
+          "label": {
+            "en": "Humidity (%)",
+            "fr": "Humidité (%)",
+            "de": "Feuchte (%)",
+            "es": "Humedad (%)"
+          }
+        },
+        {
+          "key": "wind_speed",
+          "type": "number",
+          "label": {
+            "en": "Wind (km/h)",
+            "fr": "Vent (km/h)",
+            "de": "Wind (km/h)",
+            "es": "Viento (km/h)"
+          }
+        },
+        {
+          "key": "wind_direction",
+          "type": "string",
+          "label": {
+            "en": "Wind direction",
+            "fr": "Direction du vent",
+            "de": "Windrichtung",
+            "es": "Dirección del viento"
+          }
+        },
+        {
+          "key": "wind_gust",
+          "type": "number",
+          "label": {
+            "en": "Gusts (km/h)",
+            "fr": "Rafales (km/h)",
+            "de": "Böen (km/h)",
+            "es": "Ráfagas (km/h)"
+          }
+        },
+        {
+          "key": "rain_since_9am",
+          "type": "number",
+          "label": {
+            "en": "Rain since 9am (mm)",
+            "fr": "Pluie depuis 9h (mm)",
+            "de": "Regen seit 9 Uhr (mm)",
+            "es": "Lluvia desde 9h (mm)"
+          }
+        },
+        {
+          "key": "min_temperature",
+          "type": "number",
+          "label": {
+            "en": "Minimum so far (°C)",
+            "fr": "Minimum du jour (°C)",
+            "de": "Bisheriges Minimum (°C)",
+            "es": "Mínima hasta ahora (°C)"
+          }
+        },
+        {
+          "key": "max_temperature",
+          "type": "number",
+          "label": {
+            "en": "Maximum so far (°C)",
+            "fr": "Maximum du jour (°C)",
+            "de": "Bisheriges Maximum (°C)",
+            "es": "Máxima hasta ahora (°C)"
+          }
+        },
+        {
+          "key": "station",
+          "type": "string",
+          "label": {
+            "en": "Station",
+            "fr": "Station",
+            "de": "Station",
+            "es": "Estación"
+          }
+        },
+        {
+          "key": "observation_time",
+          "type": "string",
+          "label": {
+            "en": "Observed at",
+            "fr": "Relevé à",
+            "de": "Gemessen um",
+            "es": "Observado a las"
+          }
+        },
+        {
+          "key": "location",
+          "type": "string",
+          "label": {
+            "en": "Location",
+            "fr": "Localisation",
+            "de": "Ort",
+            "es": "Ubicación"
+          }
+        }
+      ]
+    },
+    {
+      "key": "get_forecast",
+      "label": {
+        "en": "Get BoM forecast",
+        "fr": "Prévisions BoM",
+        "de": "BoM-Vorhersage",
+        "es": "Pronóstico BoM"
+      },
+      "description": {
+        "en": "Daily forecast of the location: temperatures, rain, UV, fire danger.",
+        "fr": "Prévision du jour choisi : températures, pluie, UV, danger d'incendie.",
+        "de": "Tagesvorhersage: Temperaturen, Regen, UV, Brandgefahr.",
+        "es": "Pronóstico diario: temperaturas, lluvia, UV, peligro de incendio."
+      },
+      "timeout_seconds": 20,
+      "fields": [
+        {
+          "key": "location",
+          "type": "string",
+          "label": {
+            "en": "Location",
+            "fr": "Localisation",
+            "de": "Ort",
+            "es": "Ubicación"
+          },
+          "description": {
+            "en": "Leave empty for the configured location. Accepts scene variables.",
+            "fr": "Laissez vide pour la localisation configurée. Accepte les variables de scène.",
+            "de": "Leer lassen für den konfigurierten Ort. Akzeptiert Szenenvariablen.",
+            "es": "Deje vacío para la ubicación configurada. Acepta variables de escena."
+          },
+          "placeholder": {
+            "en": "e.g. Parramatta or 2150",
+            "fr": "ex. Parramatta ou 2150",
+            "de": "z. B. Parramatta oder 2150",
+            "es": "p. ej. Parramatta o 2150"
+          }
+        },
+        {
+          "key": "day",
+          "type": "select",
+          "label": {
+            "en": "Day",
+            "fr": "Jour",
+            "de": "Tag",
+            "es": "Día"
+          },
+          "default": "0",
+          "options": [
+            {
+              "value": "0",
+              "label": {
+                "en": "Today",
+                "fr": "Aujourd'hui",
+                "de": "Heute",
+                "es": "Hoy"
+              }
+            },
+            {
+              "value": "1",
+              "label": {
+                "en": "Tomorrow",
+                "fr": "Demain",
+                "de": "Morgen",
+                "es": "Mañana"
+              }
+            },
+            {
+              "value": "2",
+              "label": {
+                "en": "In 2 days",
+                "fr": "Dans 2 jours",
+                "de": "In 2 Tagen",
+                "es": "Dentro de 2 días"
+              }
+            },
+            {
+              "value": "3",
+              "label": {
+                "en": "In 3 days",
+                "fr": "Dans 3 jours",
+                "de": "In 3 Tagen",
+                "es": "Dentro de 3 días"
+              }
+            },
+            {
+              "value": "4",
+              "label": {
+                "en": "In 4 days",
+                "fr": "Dans 4 jours",
+                "de": "In 4 Tagen",
+                "es": "Dentro de 4 días"
+              }
+            },
+            {
+              "value": "5",
+              "label": {
+                "en": "In 5 days",
+                "fr": "Dans 5 jours",
+                "de": "In 5 Tagen",
+                "es": "Dentro de 5 días"
+              }
+            },
+            {
+              "value": "6",
+              "label": {
+                "en": "In 6 days",
+                "fr": "Dans 6 jours",
+                "de": "In 6 Tagen",
+                "es": "Dentro de 6 días"
+              }
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "key": "temperature_min",
+          "type": "number",
+          "label": {
+            "en": "Minimum (°C)",
+            "fr": "Minimum (°C)",
+            "de": "Minimum (°C)",
+            "es": "Mínima (°C)"
+          }
+        },
+        {
+          "key": "temperature_max",
+          "type": "number",
+          "label": {
+            "en": "Maximum (°C)",
+            "fr": "Maximum (°C)",
+            "de": "Maximum (°C)",
+            "es": "Máxima (°C)"
+          }
+        },
+        {
+          "key": "summary",
+          "type": "string",
+          "label": {
+            "en": "Summary",
+            "fr": "Résumé",
+            "de": "Zusammenfassung",
+            "es": "Resumen"
+          }
+        },
+        {
+          "key": "details",
+          "type": "string",
+          "label": {
+            "en": "Detailed forecast",
+            "fr": "Prévision détaillée",
+            "de": "Ausführliche Vorhersage",
+            "es": "Pronóstico detallado"
+          }
+        },
+        {
+          "key": "rain_chance",
+          "type": "number",
+          "label": {
+            "en": "Chance of rain (%)",
+            "fr": "Risque de pluie (%)",
+            "de": "Regenwahrscheinlichkeit (%)",
+            "es": "Prob. de lluvia (%)"
+          }
+        },
+        {
+          "key": "rain_min",
+          "type": "number",
+          "label": {
+            "en": "Rain, low estimate (mm)",
+            "fr": "Pluie, estimation basse (mm)",
+            "de": "Regen, untere Schätzung (mm)",
+            "es": "Lluvia, estimación baja (mm)"
+          }
+        },
+        {
+          "key": "rain_max",
+          "type": "number",
+          "label": {
+            "en": "Rain, high estimate (mm)",
+            "fr": "Pluie, estimation haute (mm)",
+            "de": "Regen, obere Schätzung (mm)",
+            "es": "Lluvia, estimación alta (mm)"
+          }
+        },
+        {
+          "key": "uv_max",
+          "type": "number",
+          "label": {
+            "en": "Max UV index",
+            "fr": "Indice UV max",
+            "de": "Max. UV-Index",
+            "es": "Índice UV máx."
+          }
+        },
+        {
+          "key": "uv_category",
+          "type": "string",
+          "label": {
+            "en": "UV category",
+            "fr": "Catégorie UV",
+            "de": "UV-Kategorie",
+            "es": "Categoría UV"
+          }
+        },
+        {
+          "key": "fire_danger",
+          "type": "string",
+          "label": {
+            "en": "Fire danger rating",
+            "fr": "Danger d'incendie",
+            "de": "Brandgefahr",
+            "es": "Peligro de incendio"
+          }
+        },
+        {
+          "key": "sunrise",
+          "type": "string",
+          "label": {
+            "en": "Sunrise",
+            "fr": "Lever du soleil",
+            "de": "Sonnenaufgang",
+            "es": "Amanecer"
+          }
+        },
+        {
+          "key": "sunset",
+          "type": "string",
+          "label": {
+            "en": "Sunset",
+            "fr": "Coucher du soleil",
+            "de": "Sonnenuntergang",
+            "es": "Atardecer"
+          }
+        },
+        {
+          "key": "date",
+          "type": "string",
+          "label": {
+            "en": "Date",
+            "fr": "Date",
+            "de": "Datum",
+            "es": "Fecha"
+          }
+        },
+        {
+          "key": "location",
+          "type": "string",
+          "label": {
+            "en": "Location",
+            "fr": "Localisation",
+            "de": "Ort",
+            "es": "Ubicación"
+          }
+        }
+      ]
+    },
+    {
+      "key": "get_warnings",
+      "label": {
+        "en": "Get BoM warnings",
+        "fr": "Alertes BoM en cours",
+        "de": "Aktuelle BoM-Warnungen",
+        "es": "Avisos BoM vigentes"
+      },
+      "description": {
+        "en": "Count and names of the warnings in force at the location.",
+        "fr": "Nombre et noms des alertes en cours sur la localisation.",
+        "de": "Anzahl und Namen der geltenden Warnungen.",
+        "es": "Número y nombres de los avisos vigentes."
+      },
+      "timeout_seconds": 20,
+      "fields": [
+        {
+          "key": "location",
+          "type": "string",
+          "label": {
+            "en": "Location",
+            "fr": "Localisation",
+            "de": "Ort",
+            "es": "Ubicación"
+          },
+          "description": {
+            "en": "Leave empty for the configured location. Accepts scene variables.",
+            "fr": "Laissez vide pour la localisation configurée. Accepte les variables de scène.",
+            "de": "Leer lassen für den konfigurierten Ort. Akzeptiert Szenenvariablen.",
+            "es": "Deje vacío para la ubicación configurada. Acepta variables de escena."
+          },
+          "placeholder": {
+            "en": "e.g. Parramatta or 2150",
+            "fr": "ex. Parramatta ou 2150",
+            "de": "z. B. Parramatta oder 2150",
+            "es": "p. ej. Parramatta o 2150"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "key": "count",
+          "type": "number",
+          "label": {
+            "en": "Warnings",
+            "fr": "Alertes",
+            "de": "Warnungen",
+            "es": "Avisos"
+          }
+        },
+        {
+          "key": "major_count",
+          "type": "number",
+          "label": {
+            "en": "Major warnings",
+            "fr": "Alertes majeures",
+            "de": "Schwere Warnungen",
+            "es": "Avisos mayores"
+          }
+        },
+        {
+          "key": "minor_count",
+          "type": "number",
+          "label": {
+            "en": "Minor warnings",
+            "fr": "Alertes mineures",
+            "de": "Geringe Warnungen",
+            "es": "Avisos menores"
+          }
+        },
+        {
+          "key": "has_major",
+          "type": "boolean",
+          "label": {
+            "en": "Major warning in force",
+            "fr": "Alerte majeure en cours",
+            "de": "Schwere Warnung aktiv",
+            "es": "Aviso mayor vigente"
+          }
+        },
+        {
+          "key": "titles",
+          "type": "string",
+          "label": {
+            "en": "Warning names",
+            "fr": "Noms des alertes",
+            "de": "Namen der Warnungen",
+            "es": "Nombres de los avisos"
+          }
+        },
+        {
+          "key": "location",
+          "type": "string",
+          "label": {
+            "en": "Location",
+            "fr": "Localisation",
+            "de": "Ort",
+            "es": "Ubicación"
+          }
+        }
+      ]
+    }
+  ],
+  "widgets": [
+    {
+      "key": "bom_current",
+      "label": {
+        "en": "BoM conditions",
+        "fr": "Conditions BoM",
+        "de": "BoM-Wetter",
+        "es": "Condiciones BoM"
+      },
+      "description": {
+        "en": "Observed temperature, humidity and wind, next 24 h, fire danger and UV.",
+        "fr": "Température, humidité et vent relevés, 24 h à venir, danger d'incendie et UV.",
+        "de": "Gemessene Temperatur, Feuchte und Wind, nächste 24 h, Brandgefahr und UV.",
+        "es": "Temperatura, humedad y viento observados, próximas 24 h, incendio y UV."
+      },
+      "icon": "thermometer",
+      "settings": [
+        {
+          "key": "location",
+          "type": "string",
+          "label": {
+            "en": "Location",
+            "fr": "Localisation",
+            "de": "Ort",
+            "es": "Ubicación"
+          },
+          "description": {
+            "en": "Leave empty for the configured location.",
+            "fr": "Laissez vide pour la localisation configurée.",
+            "de": "Leer lassen für den konfigurierten Ort.",
+            "es": "Deje vacío para la ubicación configurada."
+          },
+          "placeholder": {
+            "en": "e.g. Parramatta or 2150",
+            "fr": "ex. Parramatta ou 2150",
+            "de": "z. B. Parramatta oder 2150",
+            "es": "p. ej. Parramatta o 2150"
+          }
+        }
+      ],
+      "action_timeout_seconds": 20
+    },
+    {
+      "key": "bom_forecast",
+      "label": {
+        "en": "BoM 7-day forecast",
+        "fr": "Prévisions BoM 7 jours",
+        "de": "BoM 7-Tage-Prognose",
+        "es": "Pronóstico BoM 7 días"
+      },
+      "description": {
+        "en": "The 7-day forecast: temperatures, chance of rain, details per day.",
+        "fr": "Prévisions à 7 jours : températures, risque de pluie, détail par jour.",
+        "de": "7-Tage-Vorhersage: Temperaturen, Regenrisiko, Details pro Tag.",
+        "es": "Pronóstico a 7 días: temperaturas, probabilidad de lluvia, detalle diario."
+      },
+      "icon": "calendar",
+      "settings": [
+        {
+          "key": "location",
+          "type": "string",
+          "label": {
+            "en": "Location",
+            "fr": "Localisation",
+            "de": "Ort",
+            "es": "Ubicación"
+          },
+          "description": {
+            "en": "Leave empty for the configured location.",
+            "fr": "Laissez vide pour la localisation configurée.",
+            "de": "Leer lassen für den konfigurierten Ort.",
+            "es": "Deje vacío para la ubicación configurada."
+          },
+          "placeholder": {
+            "en": "e.g. Parramatta or 2150",
+            "fr": "ex. Parramatta ou 2150",
+            "de": "z. B. Parramatta oder 2150",
+            "es": "p. ej. Parramatta o 2150"
+          }
+        }
+      ],
+      "action_timeout_seconds": 20
+    },
+    {
+      "key": "bom_warnings",
+      "label": {
+        "en": "BoM warnings",
+        "fr": "Alertes BoM",
+        "de": "BoM-Warnungen",
+        "es": "Avisos BoM"
+      },
+      "description": {
+        "en": "Warnings in force at the location, with a link to each BoM warning.",
+        "fr": "Alertes en cours sur la localisation, avec un lien vers chaque alerte du BoM.",
+        "de": "Geltende Warnungen am Ort, mit Link zu jeder BoM-Warnung.",
+        "es": "Avisos vigentes en la ubicación, con enlace a cada aviso del BoM."
+      },
+      "icon": "alert-triangle",
+      "settings": [
+        {
+          "key": "location",
+          "type": "string",
+          "label": {
+            "en": "Location",
+            "fr": "Localisation",
+            "de": "Ort",
+            "es": "Ubicación"
+          },
+          "description": {
+            "en": "Leave empty for the configured location.",
+            "fr": "Laissez vide pour la localisation configurée.",
+            "de": "Leer lassen für den konfigurierten Ort.",
+            "es": "Deje vacío para la ubicación configurada."
+          },
+          "placeholder": {
+            "en": "e.g. Parramatta or 2150",
+            "fr": "ex. Parramatta ou 2150",
+            "de": "z. B. Parramatta oder 2150",
+            "es": "p. ej. Parramatta o 2150"
+          }
+        }
+      ],
+      "action_timeout_seconds": 30
+    }
+  ]
+}
