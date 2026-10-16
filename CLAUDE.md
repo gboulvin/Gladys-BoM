@@ -27,6 +27,7 @@ node --test --test-name-pattern "alerts"  # tests whose name matches
 npm run lint                              # ESLint
 npm run format:check                      # Prettier, as the CI runs it
 npm run format                            # Prettier, fix in place
+npm run deps:check                        # what Dependabot would propose (network)
 npx github:GladysAssistant/integration-store .   # store admission checks
 ```
 
@@ -86,5 +87,15 @@ test/                   node --test, fake Gladys of the SDK + fake BoM API (test
   catalog `description` holds 10 to 100 characters per language, widget
   labels 3 to 30. Scene trigger `fields` cannot be `boolean`. Event `data` is
   flat (primitives) and limited to the declared `fields` / `variables` keys.
+- **Stay ahead of Dependabot.** Dependabot opens a pull request for every
+  outdated npm package, every new major of a GitHub Action and every
+  advisory, right after each push. Before every push or release, run
+  `npm run deps:check` and ship what it lists in the same work: `npm install
+<pkg>@^<latest>` (dev tools) or `npm audit fix`, and bump the `@vN` of an
+  action in every workflow after reading its release notes (a new major can
+  rename inputs). An SDK update (`@gladysassistant/integration-sdk`) may
+  bring new categories or contracts: read its changelog and run the tests.
+  Then `npm run format:check && npm run lint && npm test`. Open Dependabot
+  pull requests made obsolete this way close themselves on its next run.
 - **Style.** Prettier formats, ESLint catches mistakes. Comments explain why,
   in English.

@@ -10,6 +10,12 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+### Changed
+
+- Development tools and CI actions up to date (Prettier 3.9.10, ESLint
+  10.13.0, `actions/setup-node` v7, `docker/setup-qemu-action` v4), and a
+  `npm run deps:check` command listing what Dependabot would propose.
+
 ## [1.0.0] - 2026-10-16
 
 ### Added

@@ -80,7 +80,11 @@ npm test               # unit tests (no network: the BoM API is faked)
 npm run lint           # ESLint
 npm run format:check   # Prettier
 npx github:GladysAssistant/integration-store .   # store validation
+npm run deps:check     # outdated packages, advisories and GitHub Actions
 ```
+
+`deps:check` lists what Dependabot would open pull requests for: run it
+before each push or release and ship the updates with the work.
 
 Run it against a Gladys instance:
 
