@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-16
+
 ### Added
 
 - Weather provider for Gladys backed by the Australian Bureau of Meteorology
@@ -29,4 +31,5 @@ the notes of the version's GitHub Release.
 - CI (format, lint, tests on Node 22 and 24, Docker build), multi-arch image
   and GitHub Release workflows from the official integration template.
 
-[Unreleased]: https://github.com/gboulvin/Gladys-BoM/commits/main
+[Unreleased]: https://github.com/gboulvin/Gladys-BoM/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/gboulvin/Gladys-BoM/releases/tag/v1.0.0

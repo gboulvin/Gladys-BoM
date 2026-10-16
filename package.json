@@ -1,6 +1,6 @@
 {
   "name": "gladys-bom",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Gladys Assistant external integration for Australian weather from the Bureau of Meteorology (BoM).",
   "type": "module",
