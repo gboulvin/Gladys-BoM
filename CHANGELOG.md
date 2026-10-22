@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-10-22
+
 ### Changed
 
 - Development tools and CI actions up to date (Prettier 3.9.10, ESLint
@@ -42,5 +44,6 @@ the notes of the version's GitHub Release.
 - CI (format, lint, tests on Node 22 and 24, Docker build), multi-arch image
   and GitHub Release workflows from the official integration template.
 
-[Unreleased]: https://github.com/gboulvin/Gladys-BoM/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/gboulvin/Gladys-BoM/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/gboulvin/Gladys-BoM/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/gboulvin/Gladys-BoM/releases/tag/v1.0.0
