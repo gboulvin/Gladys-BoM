@@ -16,6 +16,11 @@ the notes of the version's GitHub Release.
   10.13.0, `actions/setup-node` v7, `docker/setup-qemu-action` v4), and a
   `npm run deps:check` command listing what Dependabot would propose.
 
+### Security
+
+- The image is rebuilt on the latest `node:24-alpine` (Node.js and Alpine
+  security patches); development tools and CI actions up to date.
+
 ## [1.0.0] - 2026-10-16
 
 ### Added
