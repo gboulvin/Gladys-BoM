@@ -19,7 +19,8 @@ and the [`@gladysassistant/integration-sdk`](https://github.com/GladysAssistant/
 | `transports`     | `cloud` — only talks to the BoM over the Internet |
 | `location`       | `true` — reads the house position (monitoring)    |
 | `categories`     | `environment`, `services`                         |
-| `gladys_version` | `>=5.1.0` (scene and widget capabilities)         |
+| `countries`      | `AU`                                              |
+| `gladys_version` | `>=5.3.0` (catalog keywords and countries)        |
 | Languages        | English, French, German, Spanish                  |
 
 ## Features
